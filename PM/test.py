@@ -8,4 +8,7 @@ mydb = mc.connect(host="localhost",
 cursor = mydb.cursor()
 
 cursor.execute("select * from passw")
-print(cursor.fetchall())
+# cursor.execute("INSERT INTO passw (site, username, password) VALUES" + "('nse.in', 'kite', '3rfcaw')")
+# mydb.commit()
+for passws in cursor.fetchall():
+    print(passws)

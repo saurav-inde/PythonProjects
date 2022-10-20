@@ -1,46 +1,72 @@
 import sys
 from password import password
 from database import database
+from hash import sha_512
 
 
 class PM:
     def __init__(self):
 
-        self.database = database(self)
-        self.user ={"host" : "localhost",
-                    "password" : "2050",
-                    "username" : "root",
-                    "database" : "PM"
-                    }
-        self.authaucticated = 0
-        self.auth()
-        if not self.authaucticated:
-            sys.exit()
-        self.passw = password(self)
-        self.passw.menu()
-    def auth(self):
-        mk = input("Enter the masterkey: ")
-        masterkey = "332211"
-        if mk == masterkey:
-            self.authaucticated = 1
+        self.user_default = {"host": "localhost",
+                             "password": "2050",
+                             "username": "root",
+                             "database": "pm"
+                             }
+        self.user = self.user_default
 
+        self.authenticated = False
+        self.auth()
+        if not self.authenticated:
+            print("Sorry, your identity could not be authenticated!")
+            sys.exit()
+        self.database = database(self)
+        self.current_password = password(self)
+        while self.current_password.choice:
+            self.current_password.menu()
+            self.current_password = password(self)
+
+    def auth(self):
+        try:
+            with open(".backup", "r") as bakp:
+                hash_value = bakp.read()
+                if hash_value:
+                    key = input("Enter the masterkey for authentication: ")
+                    print(sha_512(key), end="\n")
+                    print(hash_value)
+                    if sha_512(key) == hash_value:
+                        self.authenticated = True
+                        return
+                    else:
+                        print("Authentication failure!")
+        except:
+            print("No Database found...\n")
+            print("CREATING DATABASE\n")
+
+            with open(".backup", "w") as bakp:
+                master_key = input("Choose a masterkey for your passwords: ")
+                bakp.write(sha_512(master_key))
+        # self.auth()
 
     def delete(self, password):
-        
-        pass
-    def update(self, new_password):
-        pass
-        # self.database.execute(f"-- INSERT INTO passw (site, username, password) VALUES ({password.site}, {password.username}, {password.password})")
+        self.database.execute("DELETE FROM passw WHERE site='{0}'".format(password.site), 1)
+
+    def update(self, password):
+        command = f"UPDATE passw SET password = '{password.password}' WHERE site = '{password.site}'"
+        self.database.execute(
+          command, commit=1)
+
     def insert(self, password):
-        self.database.execute(f"INSERT INTO passw (site, username, password) VALUES ({password.site}, {password.username}, {password.password})")
+        command = "INSERT INTO passw (site, username, password) VALUES" + f"('{password.site}', '{password.username}', '{password.password}')"
+        print(command)
+        self.database.execute(command, 1)
+
     def show(self, site):
         print(f"_{site}_")
         self.database.cursor.execute(
             f"SELECT * FROM passw WHERE site = '{site}'")
         print(self.database.cursor.fetchall())
-        self.database.cursor.execute(
-            f"SELECT * FROM passw")
-        print(self.database.cursor.fetchall())
+        # print(self.database.cursor.fetchall())
+
 
 if __name__ == "__main__":
     pm = PM()
