@@ -71,5 +71,10 @@ class password:
     def show(self):
         pass
 
-    def insert(self):
-        self.pm.insert(self)
+    def insert(self, list_args:list = None):
+        if list_args:
+            self.site = list_args[0]
+            self.username = list_args[1]
+            self.password = list_args[2]
+
+            self.pm.insert(self)

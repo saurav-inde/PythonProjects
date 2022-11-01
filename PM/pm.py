@@ -2,6 +2,7 @@ import sys
 from password import password
 from database import database
 from hash import sha_512
+from ArgParser import CmdArgs
 
 
 class PM:
@@ -15,22 +16,29 @@ class PM:
         self.user = self.user_default
 
         self.authenticated = False
+        self.current_password = password(self)
+        self.database = database(self)
+        self.argparser = CmdArgs(self)
         self.auth()
         if not self.authenticated:
             print("Sorry, your identity could not be authenticated!")
             sys.exit()
-        self.database = database(self)
-        self.current_password = password(self)
+
         while self.current_password.choice:
             self.current_password.menu()
             self.current_password = password(self)
 
     def auth(self):
+
         try:
             with open(".backup", "r") as bakp:
                 hash_value = bakp.read()
                 if hash_value:
-                    key = input("Enter the masterkey for authentication: ")
+                    key = ""
+                    if self.argparser.args.auth:
+                        key = self.argparser.args.auth
+                    else:
+                        key = input("Enter the masterkey for authentication: ")
                     print(sha_512(key), end="\n")
                     print(hash_value)
                     if sha_512(key) == hash_value:
@@ -53,7 +61,7 @@ class PM:
     def update(self, password):
         command = f"UPDATE passw SET password = '{password.password}' WHERE site = '{password.site}'"
         self.database.execute(
-          command, commit=1)
+            command, commit=1)
 
     def insert(self, password):
         command = "INSERT INTO passw (site, username, password) VALUES" + f"('{password.site}', '{password.username}', '{password.password}')"
