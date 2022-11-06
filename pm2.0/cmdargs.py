@@ -27,12 +27,14 @@ class CmdArgs:
         # d is for deleting a particular site-user combo from the database
         self.parser.add_argument('-d', '--delete', metavar='', nargs=2,
                                  type=str, help="format: -i <site> <username>")
+        self.parser.add_argument('-mk', '--maskey', metavar='', nargs=2,
+                                 type=str, help="format: -i <old> <new>")
 
         # calling the parse args method and storing the namespace containing arguments
         self.args = self.parser.parse_args()
 
         # maintains a set of the non default arguments currently part of the program
-        self.set_args = {'i', 'v', 'u', 'd'}
+        self.set_args = {'-i', '-v', '-u', '-d', '-mk'}
 
     # action handles the task to be executed based on the arguments specified
     def action(self):
@@ -47,6 +49,9 @@ class CmdArgs:
 
         if self.args.view:
             self.pm.show()
+
+        if self.args.maskey:
+            self.pm.change_master_key()
 
 
 if __name__ == "__main__":

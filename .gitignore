@@ -2,3 +2,8 @@
 \__pycache__
 
 *.exe
+*.db
+*.spec
+
+\build
+\dist

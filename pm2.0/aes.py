@@ -38,16 +38,3 @@ class AESCipher(object):
 
         return s[:-ord(s[len(s) - 1:])]
 
-#
-# key = input("enter the key: ")
-# encrypted_data = ''
-# a = "b'6AAae3wx9tdIzOUqF2cx2gEziY0lq/tpHZgzOEw+Kfs='"
-# b = "b'JHE/Y85mT6zSYUGqLT1yra8U0ercsdjgYSgp1JVzJn0='"
-# raw = input("enter the data to be encrypted: ")
-# encrypted = AESCipher(key)
-# # encrypted_data =encrypted.encrypt(raw)
-#
-# # print(encrypted_data)
-# print("\n")
-# # print(encrypted.decrypt(a))
-# print(encrypted.decrypt(b))
